@@ -32,3 +32,7 @@ describe ('example', () => {
 ## How it works
 
 I've written an article on Medium explaining it: [Wiring ES7 decorators to Chai Spies for declarative contracts on class methods: A metaprogramming case study](https://medium.com/@xpl/wiring-es7-decorators-to-chai-spies-for-declarative-contracts-on-class-methods-957d6a8c27e9#.30sh22os4).
+
+## Warning
+
+It is not very well tested with asynchronous tests. Should work with Promises, but not with `done` callback (not implemented).
