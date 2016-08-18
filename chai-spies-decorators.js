@@ -12,110 +12,110 @@ const $global = (typeof window === 'undefined') ? global : window
 
 const gatherContractChecks = () => {
 
-	const checklist = []
+    const checklist = []
 
-	Object.defineProperty ($global, 'will', {
+    Object.defineProperty ($global, 'will', {
 
-		configurable: true, 
-		
-		get () {
+        configurable: true, 
+        
+        get () {
 
-			return new Proxy (Object.assign (function will (chain, Class, name, desc) {
+            return new Proxy (Object.assign (function will (chain, Class, name, desc) {
 
-				const spied = chai.spy (desc.value)
-				const check = () => {
+                const spied = chai.spy (desc.value)
+                const check = () => {
 
-					let prev = undefined,
-						next = chai.expect (spied).to
+                    let prev = undefined,
+                        next = chai.expect (spied).to
 
-					chain.forEach (what => {
+                    chain.forEach (what => {
 
-						if (Array.isArray (what)) { // call args
+                        if (Array.isArray (what)) { // call args
 
-							next = next.apply (prev, what) // prev.next (what)
+                            next = next.apply (prev, what) // prev.next (what)
 
-						} else { // .what
+                        } else { // .what
 
-							prev = next
-							next = next[what]
-						}
-					})
-				}
+                            prev = next
+                            next = next[what]
+                        }
+                    })
+                }
 
-				checklist.push (check)
+                checklist.push (check)
 
-				return {
+                return {
 
-					configurable: desc.configurable,
-					enumerable:   desc.enumerable,
+                    configurable: desc.configurable,
+                    enumerable:   desc.enumerable,
 
-					get () {
-						return (...args) => spied.apply (this, args)
-					}
-				}
+                    get () {
+                        return (...args) => spied.apply (this, args)
+                    }
+                }
 
-			}, { chain: [] }), {
+            }, { chain: [] }), {
 
-				apply (target, proxy, args) {
+                apply (target, proxy, args) {
 
-					if (args[2] && (args[2].value instanceof Function)) {
+                    if (args[2] && (args[2].value instanceof Function)) {
 
-						return target (target.chain, ...args)
+                        return target (target.chain, ...args)
 
-					} else {
+                    } else {
 
-						target.chain.push (args)
-					}
-					
-					return proxy
-				},
+                        target.chain.push (args)
+                    }
+                    
+                    return proxy
+                },
 
-				get (target, prop, proxy) {
+                get (target, prop, proxy) {
 
-					target.chain.push (prop)
+                    target.chain.push (prop)
 
-					return proxy
-				}
+                    return proxy
+                }
 
-			})
-		}
-	})
+            })
+        }
+    })
 
-	return checklist
+    return checklist
 }
 
 /*  ------------------------------------------------------------------------ */
 
 const wrapIt = (prevIt, shouldFail) =>
 
-	new Proxy (prevIt, {
+    new Proxy (prevIt, {
 
-		apply (target, thisArg, args) { const [ testName, testFn ] = args
+        apply (target, thisArg, args) { const [ testName, testFn ] = args
 
-			return prevIt.call (thisArg, testName, function (...args) {
+            return prevIt.call (thisArg, testName, function (...args) {
 
-				const checks = gatherContractChecks ()
+                const checks = gatherContractChecks ()
 
-				return Promise.resolve ().then (testFn.bind (this, ...args)).then (result => {
+                return Promise.resolve ().then (testFn.bind (this, ...args)).then (result => {
 
-					checks.forEach (check => check ())
+                    checks.forEach (check => check ())
 
-					if (shouldFail) {
-						shouldFail = false
-						throw new Error ('expected to fail, but it did not happen')
-					}
+                    if (shouldFail) {
+                        shouldFail = false
+                        throw new Error ('expected to fail, but it did not happen')
+                    }
 
-					return result
+                    return result
 
-				}).catch (e => {
+                }).catch (e => {
 
-					if (!shouldFail) { throw e }
+                    if (!shouldFail) { throw e }
 
-				})
+                })
 
-			})
-		}
-	})
+            })
+        }
+    })
 
 /*  ------------------------------------------------------------------------ */
 

@@ -5,59 +5,59 @@ chai.should ()
 
 describe ('chai-spies-decorator', () => {
 
-	it ('works', function () {
+    it ('works', function () {
 
-		this.timeout.should.be.an.instanceof (Function) // it() hook should correctly pass 'this'
+        this.timeout.should.be.an.instanceof (Function) // it() hook should correctly pass 'this'
 
-		const foo = new (class Foo {
+        const foo = new (class Foo {
 
-			@will.have.been.called.with ('qux').once
-			bar (qux) { return qux + qux }
-		})
+            @will.have.been.called.with ('qux').once
+            bar (qux) { return qux + qux }
+        })
 
-		foo.bar ('qux').should.equal ('quxqux')
-	})
+        foo.bar ('qux').should.equal ('quxqux')
+    })
 
-	it.fails ('because of explicit throw', () => {
+    it.fails ('because of explicit throw', () => {
 
-		throw new Error ()
-	})
+        throw new Error ()
+    })
 
-	it.fails ('fails due to calling more than once', () => {
+    it.fails ('fails due to calling more than once', () => {
 
-		const foo = new (class Foo {
+        const foo = new (class Foo {
 
-			@will.have.been.called.once
-			bar () { }
-		})
+            @will.have.been.called.once
+            bar () { }
+        })
 
-		foo.bar ()
-		foo.bar ()
-	})
+        foo.bar ()
+        foo.bar ()
+    })
 
-	it.fails ('due to invalid argument', () => {
+    it.fails ('due to invalid argument', () => {
 
-		const foo = new (class Foo {
+        const foo = new (class Foo {
 
-			@will.have.been.called.with ('qux')
-			bar (qux) { }
-		})
+            @will.have.been.called.with ('qux')
+            bar (qux) { }
+        })
 
-		foo.bar ('zap')
-	})
+        foo.bar ('zap')
+    })
 
-	it ('multiple @will dont mess up things', () => {
+    it ('multiple @will dont mess up things', () => {
 
-		const foo = new (class Foo {
+        const foo = new (class Foo {
 
-			@will.have.been.called.once
-			bar () { }
+            @will.have.been.called.once
+            bar () { }
 
-			@will.have.been.called.twice
-			baz () { }
-		})
+            @will.have.been.called.twice
+            baz () { }
+        })
 
-		foo.bar ()
-		foo.baz (); foo.baz ()
-	})
+        foo.bar ()
+        foo.baz (); foo.baz ()
+    })
 })
