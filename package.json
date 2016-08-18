@@ -1,6 +1,6 @@
 {
   "name": "chai-spies-decorators",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chai Spies + ES7 decorators",
   "main": "chai-spies-decorators.js",
   "scripts": {
