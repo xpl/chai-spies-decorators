@@ -9,13 +9,19 @@ describe ('chai-spies-decorator', () => {
 
         this.timeout.should.be.an.instanceof (Function) // it() hook should correctly pass 'this'
 
-        const foo = new (class Foo {
+        class Foo {
 
             @will.have.been.called.with ('qux').once
-            bar (qux) { return qux + qux }
-        })
+            bar (qux) {
+                return qux + qux
+            }
+        }
 
-        foo.bar ('qux').should.equal ('quxqux')
+        const foo1 = new Foo ()
+        const foo2 = new Foo ()
+
+        foo1.bar ('qux').should.equal ('quxqux')
+        foo2.bar ('qux').should.equal ('quxqux')
     })
 
     it.fails ('because of explicit throw', () => {
@@ -51,10 +57,10 @@ describe ('chai-spies-decorator', () => {
         const foo = new (class Foo {
 
             @will.have.been.called.once
-            bar () { }
+            bar () { this.should.equal (foo) }
 
             @will.have.been.called.twice
-            baz () { }
+            baz () { this.should.equal (foo) }
         })
 
         foo.bar ()

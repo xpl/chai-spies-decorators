@@ -22,27 +22,7 @@ const gatherContractChecks = () => {
 
             return new Proxy (Object.assign (function will (chain, Class, name, desc) {
 
-                const spied = chai.spy (desc.value)
-                const check = () => {
-
-                    let prev = undefined,
-                        next = chai.expect (spied).to
-
-                    chain.forEach (what => {
-
-                        if (Array.isArray (what)) { // call args
-
-                            next = next.apply (prev, what) // prev.next (what)
-
-                        } else { // .what
-
-                            prev = next
-                            next = next[what]
-                        }
-                    })
-                }
-
-                checklist.push (check)
+                const memo = Symbol ()
 
                 return {
 
@@ -50,7 +30,37 @@ const gatherContractChecks = () => {
                     enumerable:   desc.enumerable,
 
                     get () {
-                        return (...args) => spied.apply (this, args)
+
+                    /*  memoization */
+
+                        if (this[memo]) {
+                            return this[memo] }
+                            
+                        else {
+
+                            const spied = chai.spy (desc.value)
+
+                            checklist.push (() => {
+
+                                let prev = undefined,
+                                    next = chai.expect (spied).to
+
+                                chain.forEach (what => {
+
+                                    if (Array.isArray (what)) { // call args
+
+                                        next = next.apply (prev, what) // prev.next (what)
+
+                                    } else { // .what
+
+                                        prev = next
+                                        next = next[what]
+                                    }
+                                })
+                            })
+
+                            return (this[memo] = spied)
+                        }
                     }
                 }
 
