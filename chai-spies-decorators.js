@@ -10,14 +10,14 @@ chai.use (spies)
 const prev_it = it
 const $global = (typeof window === 'undefined') ? global : window
 
-const newChecklist = () => {
+const gatherContractChecks = () => {
 
 	const checklist = []
 
 	Object.defineProperty ($global, 'will', {
 
-		configurable: true,
-
+		configurable: true, 
+		
 		get () {
 
 			return new Proxy (Object.assign (function will (chain, Class, name, desc) {
@@ -94,11 +94,11 @@ const wrapIt = (prevIt, shouldFail) =>
 
 			return prevIt.call (thisArg, testName, function (...args) {
 
-				const checklist = newChecklist ()
+				const checks = gatherContractChecks ()
 
 				return Promise.resolve ().then (testFn.bind (this, ...args)).then (result => {
 
-					checklist.forEach (check => check ())
+					checks.forEach (check => check ())
 
 					if (shouldFail) {
 						shouldFail = false
