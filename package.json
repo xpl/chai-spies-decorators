@@ -19,7 +19,7 @@
     "TDD"
   ],
   "author": "Vitaly Gordon <rocket.mind@gmail.com> (http://github.com/xpl)",
-  "license": "MIT",
+  "license": "Unlicense",
   "dependencies": {
     "chai-spies": "^0.7.1"
   },
